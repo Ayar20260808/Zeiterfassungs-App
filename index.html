@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zeiterfassung Paulus</title>
+<meta name="description" content="Zeiterfassung der Elektrotechnik Paulus GmbH">
+<meta name="theme-color" content="#232F3B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="symbole/symbol-192.png">
+<link rel="apple-touch-icon" href="symbole/symbol-192.png">
+<link rel="stylesheet" href="stil.css">
+</head>
+<body>
+
+<!-- ============ Anmeldung ============ -->
+<section id="seite-anmeldung" class="anmeldung">
+  <div class="anmeldung__karte">
+    <p class="marke">ELEKTROTECHNIK PAULUS</p>
+    <h1>Zeiterfassung</h1>
+    <p class="hinweis">Gleiche Zugangsdaten wie im Cockpit.</p>
+    <form id="formular-anmeldung" novalidate>
+      <label for="feld-email">E-Mail</label>
+      <input id="feld-email" type="email" autocomplete="username" inputmode="email" required>
+      <label for="feld-passwort">Passwort</label>
+      <input id="feld-passwort" type="password" autocomplete="current-password" required>
+      <button type="submit" class="knopf knopf--gelb" id="knopf-anmelden">Anmelden</button>
+    </form>
+    <p id="anmeldung-fehler" class="fehler" hidden></p>
+  </div>
+</section>
+
+<!-- ============ App ============ -->
+<div id="app" hidden>
+
+  <header class="kopf">
+    <p class="marke">ELEKTROTECHNIK PAULUS</p>
+    <h1 id="kopf-titel">Zeitachse</h1>
+  </header>
+
+  <main id="inhalt">
+
+    <!-- ---- Zeitachse ---- -->
+    <section id="seite-zeitachse" class="seite">
+      <div id="tagesleiste" class="tagesleiste"></div>
+      <div class="kacheln">
+        <div class="kachel"><span class="kachel__titel">Arbeit</span><strong id="summe-arbeit">0,00</strong></div>
+        <div class="kachel"><span class="kachel__titel">Fahrt</span><strong id="summe-fahrt">0,00</strong></div>
+        <div class="kachel"><span class="kachel__titel">Offen</span><strong id="summe-offen" class="warnung">0</strong></div>
+      </div>
+      <div id="liste-zeitachse" class="liste"></div>
+    </section>
+
+    <!-- ---- Stempeln ---- -->
+    <section id="seite-stempeln" class="seite" hidden>
+      <div id="stempel-anzeige" class="stempel">
+        <p class="stempel__zustand" id="stempel-zustand">Nicht eingestempelt</p>
+        <p class="stempel__uhr" id="stempel-uhr">--:--</p>
+        <p class="stempel__seit" id="stempel-seit"></p>
+      </div>
+      <div class="feldpaar">
+        <label for="feld-kunde">Kunde</label>
+        <input id="feld-kunde" type="text" placeholder="z. B. Bauherr Müller">
+      </div>
+      <div class="feldpaar">
+        <label for="feld-projekt">Projekt / Baustelle</label>
+        <input id="feld-projekt" type="text" placeholder="z. B. Neubau Nippes">
+      </div>
+      <div class="feldpaar">
+        <label for="feld-kategorie">Kategorie</label>
+        <select id="feld-kategorie"></select>
+      </div>
+      <button id="knopf-stempeln" class="knopf knopf--gelb knopf--gross">Einstempeln</button>
+      <button id="knopf-pause" class="knopf knopf--rand" hidden>Pause beginnen</button>
+      <p id="stempel-fehler" class="fehler" hidden></p>
+    </section>
+
+    <!-- ---- Woche ---- -->
+    <section id="seite-woche" class="seite" hidden>
+      <div class="wochenwahl">
+        <button id="woche-zurueck" class="knopf knopf--klein" aria-label="Woche zurück">&#8592;</button>
+        <span id="woche-titel">Diese Woche</span>
+        <button id="woche-vor" class="knopf knopf--klein" aria-label="Woche vor">&#8594;</button>
+      </div>
+      <div class="kacheln">
+        <div class="kachel"><span class="kachel__titel">Gesamt</span><strong id="woche-gesamt">0,00</strong></div>
+        <div class="kachel"><span class="kachel__titel">Fahrt</span><strong id="woche-fahrt">0,00</strong></div>
+        <div class="kachel"><span class="kachel__titel">Tage</span><strong id="woche-tage">0</strong></div>
+      </div>
+      <div id="liste-woche" class="liste"></div>
+    </section>
+
+    <!-- ---- Mehr ---- -->
+    <section id="seite-mehr" class="seite" hidden>
+      <div class="block">
+        <h2>Angemeldet</h2>
+        <p id="mehr-benutzer" class="leise">—</p>
+        <button id="knopf-abmelden" class="knopf knopf--rand">Abmelden</button>
+      </div>
+      <div class="block">
+        <h2>Gelernte Orte</h2>
+        <p class="leise">
+          Einmal benannt, erkennt die App den Ort im Umkreis von 50 Metern
+          künftig von selbst.
+        </p>
+        <div id="liste-orte" class="liste"></div>
+      </div>
+      <div class="block">
+        <h2>Über diese App</h2>
+        <p class="leise" id="mehr-version">—</p>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="navigation">
+    <button class="navigation__knopf ist-aktiv" data-seite="zeitachse">
+      <span class="navigation__symbol">&#9776;</span>Zeitachse
+    </button>
+    <button class="navigation__knopf" data-seite="stempeln">
+      <span class="navigation__symbol">&#9719;</span>Stempeln
+    </button>
+    <button class="navigation__knopf" data-seite="woche">
+      <span class="navigation__symbol">&#9636;</span>Woche
+    </button>
+    <button class="navigation__knopf" data-seite="mehr">
+      <span class="navigation__symbol">&#8943;</span>Mehr
+    </button>
+  </nav>
+</div>
+
+<div id="melder" class="melder" hidden></div>
+
+<script src="konfig.js"></script>
+<script src="js/daten.js"></script>
+<script src="js/hilfen.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

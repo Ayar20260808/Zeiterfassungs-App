@@ -1,0 +1,30 @@
+# Netlify-Konfiguration fuer die Zeiterfassung.
+#
+# Die App braucht keinen Baukasten (kein React, kein npm). Der "Build"
+# besteht nur daraus, die Datei konfig.js aus den Umgebungsvariablen zu
+# erzeugen - damit die Zugangsdaten nicht im Repository stehen.
+
+[build]
+  command = "sh erzeuge-konfig.sh"
+  publish = "."
+
+# Sicherheits-Kopfzeilen fuer alle Seiten.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(self), camera=(), microphone=()"
+
+# Der Service Worker darf nie aus dem Zwischenspeicher kommen,
+# sonst bleibt eine alte Version der App auf dem Handy haengen.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/konfig.js"
+  [headers.values]
+    Cache-Control = "no-cache"

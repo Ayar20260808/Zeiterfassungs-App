@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 448" role="img" aria-label="Elektrotechnik Paulus">
+  <title>Elektrotechnik Paulus</title>
+  <g>
+    <g transform="translate(0 0)">
+      <rect width="448" height="448" rx="30" fill="#232F3B"/>
+      <g transform="translate(224 224) scale(0.95) translate(-224 -224)">
+        <path d="M72.9 76.9 L394.6 398.6" stroke="#FFD700" stroke-width="19"/>
+        <path d="M396.8 49.2 L221.0 225.0" stroke="#FFD700" stroke-width="19"/>
+        <path d="M57.0 176.9 L269.1 389.0" stroke="#FFD700" stroke-width="19"/>
+        <path d="M74.3 310.2 L135.8 371.7" stroke="#FFD700" stroke-width="19"/>
+      </g>
+    </g>
+  </g>
+</svg>

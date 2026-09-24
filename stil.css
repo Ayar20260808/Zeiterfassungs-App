@@ -1,0 +1,339 @@
+/* Zeiterfassung Paulus - Aussehen.
+   Farben aus dem Corporate Design (marke.css der Homepage). */
+
+:root {
+  --anthrazit:      #232F3B;
+  --anthrazit-hell: #3A4956;
+  --gelb:           #FFD700;
+  --gelb-dunkel:    #E6C200;
+  --grau:           #6B7480;
+  --grau-hell:      #F2F4F6;
+  --rot:            #B3261E;
+
+  --text:        var(--anthrazit);
+  --text-leise:  var(--grau);
+  --hintergrund: #FFFFFF;
+  --flaeche:     var(--grau-hell);
+  --rand:        #E1E5EA;
+  --radius:      10px;
+
+  --schrift: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --text:        #EDF0F3;
+    --text-leise:  #9BA5B1;
+    --hintergrund: #161D25;
+    --flaeche:     #1F2831;
+    --rand:        #2C3742;
+  }
+}
+:root[data-theme="dark"] {
+  --text:        #EDF0F3;
+  --text-leise:  #9BA5B1;
+  --hintergrund: #161D25;
+  --flaeche:     #1F2831;
+  --rand:        #2C3742;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--schrift);
+  color: var(--text);
+  background: var(--hintergrund);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1 { font-size: 1.55rem; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 1rem; margin: 0 0 8px; }
+
+.marke {
+  margin: 0 0 2px;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: var(--gelb);
+  font-weight: 600;
+}
+
+.leise { color: var(--text-leise); font-size: 0.88rem; }
+.warnung { color: #C77700; }
+.fehler {
+  color: var(--rot);
+  background: rgba(179, 38, 30, 0.08);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  margin: 12px 0 0;
+}
+
+/* ---------- Anmeldung ---------- */
+
+.anmeldung {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--anthrazit);
+}
+.anmeldung__karte {
+  width: 100%;
+  max-width: 380px;
+  background: var(--hintergrund);
+  border-radius: 14px;
+  padding: 26px 20px 24px;
+}
+.anmeldung .hinweis { color: var(--text-leise); font-size: 0.88rem; margin: 6px 0 20px; }
+.anmeldung label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-leise);
+  margin: 14px 0 5px;
+}
+
+/* ---------- Eingabefelder ---------- */
+
+input, select {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 11px 12px;
+  /* 16px verhindert, dass iPhones beim Antippen hineinzoomen. */
+  font-size: 16px;
+}
+input:focus, select:focus {
+  outline: 2px solid var(--gelb-dunkel);
+  outline-offset: 1px;
+}
+
+/* ---------- Knoepfe ---------- */
+
+.knopf {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  cursor: pointer;
+  background: var(--flaeche);
+  color: var(--text);
+  /* Mindestgroesse fuer Finger. */
+  min-height: 44px;
+}
+.knopf--gelb { background: var(--gelb); color: var(--anthrazit); }
+.knopf--gelb:hover { background: var(--gelb-dunkel); }
+.knopf--rand { background: transparent; border-color: var(--rand); }
+.knopf--gross { width: 100%; font-size: 1.05rem; padding: 16px; margin-top: 18px; }
+.knopf--klein { padding: 8px 12px; min-height: 36px; }
+.knopf[disabled] { opacity: 0.55; cursor: default; }
+#formular-anmeldung .knopf { width: 100%; margin-top: 22px; }
+
+/* ---------- Kopf und Navigation ---------- */
+
+.kopf {
+  background: var(--anthrazit);
+  color: #FFFFFF;
+  padding: 14px 16px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+}
+.kopf h1 { color: #FFFFFF; }
+
+#inhalt {
+  padding: 14px 16px 96px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.navigation {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--hintergrund);
+  border-top: 1px solid var(--rand);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.navigation__knopf {
+  font: inherit;
+  font-size: 0.72rem;
+  background: none;
+  border: none;
+  color: var(--text-leise);
+  padding: 9px 4px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  min-height: 56px;
+}
+.navigation__knopf.ist-aktiv { color: var(--text); font-weight: 600; }
+.navigation__symbol { font-size: 1.15rem; line-height: 1; }
+
+/* ---------- Tagesleiste ---------- */
+
+.tagesleiste {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+}
+.tagesleiste::-webkit-scrollbar { display: none; }
+.tageschip {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  text-align: center;
+  background: var(--flaeche);
+  color: var(--text);
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.tageschip.ist-aktiv {
+  background: var(--anthrazit);
+  border-color: var(--anthrazit);
+  color: #FFFFFF;
+}
+.tageschip__punkt { color: #C77700; }
+.tageschip.ist-aktiv .tageschip__punkt { color: var(--gelb); }
+
+/* ---------- Kacheln ---------- */
+
+.kacheln { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.kachel {
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.kachel__titel {
+  display: block;
+  font-size: 0.67rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-leise);
+}
+.kachel strong { font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Eintraege ---------- */
+
+.liste { display: flex; flex-direction: column; gap: 10px; }
+
+.eintrag {
+  border: 1px solid var(--rand);
+  border-left: 4px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 11px 12px;
+  background: var(--hintergrund);
+}
+.eintrag--arbeit { border-left-color: #2E7D32; }
+.eintrag--fahrt  { border-left-color: var(--anthrazit-hell); }
+.eintrag--offen  { border-left-color: #C77700; }
+
+.eintrag__kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.eintrag__zeit { font-weight: 600; font-variant-numeric: tabular-nums; }
+.eintrag__marke {
+  font-size: 0.64rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-leise);
+  border: 1px solid var(--rand);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.eintrag__dauer { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.feldpaar { margin-bottom: 10px; }
+.feldpaar label,
+.eintrag label {
+  display: block;
+  font-size: 0.67rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-leise);
+  margin-bottom: 4px;
+}
+.eintrag__reihe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.eintrag__fuss { margin-top: 8px; font-size: 0.8rem; color: var(--text-leise); }
+
+/* ---------- Stempeln ---------- */
+
+.stempel {
+  text-align: center;
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 14px;
+  padding: 22px 16px;
+  margin-bottom: 18px;
+}
+.stempel__zustand {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-leise);
+}
+.stempel__uhr {
+  margin: 6px 0 2px;
+  font-size: 2.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.stempel__seit { margin: 0; font-size: 0.85rem; color: var(--text-leise); }
+
+/* ---------- Woche und Mehr ---------- */
+
+.wochenwahl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+.block {
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.block .knopf { margin-top: 10px; }
+
+/* ---------- Meldung unten ---------- */
+
+.melder {
+  position: fixed;
+  left: 16px; right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  background: var(--anthrazit);
+  color: #FFFFFF;
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  font-size: 0.9rem;
+  text-align: center;
+  z-index: 20;
+}
+.melder--fehler { background: var(--rot); }

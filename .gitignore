@@ -1,0 +1,8 @@
+# Zugangsdaten - erzeugt Netlify beim Bauen aus den Umgebungsvariablen.
+# Darf NIEMALS im Repository landen.
+konfig.js
+
+# Betriebssystem / Editor
+.DS_Store
+Thumbs.db
+*.swp
