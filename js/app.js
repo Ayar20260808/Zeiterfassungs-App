@@ -27,6 +27,8 @@
     schicht: null,         // laufende Schicht oder null
     pause: null,           // laufende Pause oder null
     wochenStart: null,
+    personen: [],          // Namen aus der Spalte "mitarbeiter"
+    person: "",            // ausgewaehlte Person, "" = alle
   };
 
   var $ = function (id) { return document.getElementById(id); };
@@ -417,24 +419,52 @@
 
   /* ---------- 6. Woche ---------- */
 
+  /* Die Namen fuer die Auswahl kommen aus der Tabelle selbst - nichts
+   * fest verdrahtet. Wer welche Namen sieht, entscheiden die
+   * Rechteregeln der Datenbank: eigene Zeilen immer, alle nur mit der
+   * Rolle "inhaber" oder "buero". */
+  async function personenLaden() {
+    if (zustand.personen.length) return;
+
+    var zeilen = (await ZE.anfrage("Stunden?select=mitarbeiter&mitarbeiter=not.is.null")) || [];
+    var namen = [];
+    zeilen.forEach(function (z) {
+      if (z.mitarbeiter && namen.indexOf(z.mitarbeiter) === -1) namen.push(z.mitarbeiter);
+    });
+    zustand.personen = namen.sort(function (a, b) { return a.localeCompare(b, "de"); });
+
+    var feld = $("feld-person");
+    feld.textContent = "";
+    feld.appendChild(el("option", { value: "", text: "Alle Personen" }));
+    zustand.personen.forEach(function (n) {
+      feld.appendChild(el("option", { value: n, text: n }));
+    });
+
+    // Steht der eigene Name genau so in der Tabelle, ist er vorausgewaehlt.
+    // Sonst bleibt es bei "Alle Personen" - besser als ein leerer Bildschirm.
+    if (zustand.benutzer.name && zustand.personen.indexOf(zustand.benutzer.name) > -1) {
+      zustand.person = zustand.benutzer.name;
+    }
+    feld.value = zustand.person;
+  }
+
   async function wocheLaden() {
     if (!zustand.wochenStart) zustand.wochenStart = ZE.wochenStart(new Date());
+    await personenLaden();
+
     var von = zustand.wochenStart;
     var bis = new Date(von);
     bis.setDate(bis.getDate() + 6);
 
-    // Nur die eigenen Zeiten: entweder ueber die Benutzerkennung
-    // oder ueber den Namen, den alte Zeilen tragen.
-    var filter = "benutzer_id.eq." + zustand.benutzer.id;
-    if (zustand.benutzer.name) {
-      filter += ',mitarbeiter.eq."' + zustand.benutzer.name.replace(/"/g, '\\"') + '"';
-    }
-
-    var zeilen = (await ZE.anfrage(
+    var pfad =
       "Stunden?select=*&datum=gte." + ZE.datumSchluessel(von) +
       "&datum=lte." + ZE.datumSchluessel(bis) +
-      "&or=(" + filter + ")&order=datum.asc"
-    )) || [];
+      "&order=datum.asc";
+    if (zustand.person) {
+      pfad += "&mitarbeiter=eq." + encodeURIComponent(zustand.person);
+    }
+
+    var zeilen = (await ZE.anfrage(pfad)) || [];
 
     $("woche-titel").textContent =
       von.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }) + " – " +
@@ -454,20 +484,35 @@
     var liste = $("liste-woche");
     liste.textContent = "";
     if (zeilen.length === 0) {
-      liste.appendChild(el("p", { klasse: "leise", text: "Für diese Woche sind keine Stunden erfasst." }));
+      liste.appendChild(el("p", {
+        klasse: "leise",
+        text: zustand.person
+          ? "Für diese Woche sind unter „" + zustand.person + "“ keine Stunden erfasst."
+          : "Für diese Woche sind keine Stunden erfasst.",
+      }));
       return;
     }
     zeilen.forEach(function (z) {
+      // Bei "Alle Personen" gehoert der Name in die Zeile, sonst steht
+      // er schon oben in der Auswahl.
+      var fuss = [z.kunde, z.projekt].filter(Boolean).join(" · ") || "ohne Zuordnung";
+      if (!zustand.person && z.mitarbeiter) fuss = z.mitarbeiter + " — " + fuss;
+
       liste.appendChild(el("div", { klasse: "eintrag eintrag--arbeit" }, [
         el("div", { klasse: "eintrag__kopf" }, [
           el("span", { klasse: "eintrag__zeit", text: ZE.datumKurz(z.datum + "T12:00:00") }),
           el("span", { klasse: "eintrag__marke", text: z.quelle || "—" }),
           el("span", { klasse: "eintrag__dauer", text: ZE.stundenText(z.stunden || 0) }),
         ]),
-        el("p", { klasse: "eintrag__fuss", text: [z.kunde, z.projekt].filter(Boolean).join(" · ") || "ohne Zuordnung" }),
+        el("p", { klasse: "eintrag__fuss", text: fuss }),
       ]));
     });
   }
+
+  $("feld-person").addEventListener("change", function (ereignis) {
+    zustand.person = ereignis.target.value;
+    wocheLaden().catch(fehlerBehandeln);
+  });
 
   $("woche-zurueck").addEventListener("click", function () {
     zustand.wochenStart.setDate(zustand.wochenStart.getDate() - 7);
