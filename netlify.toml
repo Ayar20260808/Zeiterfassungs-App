@@ -15,6 +15,30 @@
   SUPABASE_URL = "Adresse des Supabase-Projekts, z. B. https://abcdefgh.supabase.co"
   SUPABASE_PUBLISHABLE_KEY = "Der oeffentliche Schluessel (anon/publishable) - NICHT der Service-Key"
 
+# Weil publish = "." gilt, liegt das ganze Repository im Netz - auch was
+# nur zum Bauen oder zum Nachlesen da ist. Diese Pfade antworten deshalb
+# mit "nicht gefunden". Wichtig, sobald das Repository privat ist: sonst
+# waeren die Dateien ueber die Website weiter lesbar.
+[[redirects]]
+  from = "/sql/*"
+  to = "/index.html"
+  status = 404
+
+[[redirects]]
+  from = "/erzeuge-konfig.sh"
+  to = "/index.html"
+  status = 404
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/index.html"
+  status = 404
+
+[[redirects]]
+  from = "/konfig.beispiel.js"
+  to = "/index.html"
+  status = 404
+
 # Sicherheits-Kopfzeilen fuer alle Seiten.
 [[headers]]
   for = "/*"
