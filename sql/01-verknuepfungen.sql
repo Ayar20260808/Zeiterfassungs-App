@@ -1,5 +1,6 @@
 -- ===================================================================
--- NOCH NICHT AUSGEFUEHRT. Bitte erst lesen und freigeben.
+-- AUSGEFUEHRT am 24.09.2026 als Migration
+-- "zeiten_mit_kunde_auftrag_aufgabe_verknuepfen".
 --
 -- Zweck: Zeiten mit Kunde, Auftrag, Aufgabe und Abrechnung verbinden.
 --
