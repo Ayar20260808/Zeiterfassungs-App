@@ -64,6 +64,16 @@ Dann `http://localhost:8000` im Browser öffnen.
 
 ## Auf Netlify veröffentlichen
 
+**Der kurze Weg — ein Klick:**
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Ayar20260808/Zeiterfassungs-App)
+
+Netlify fragt dabei selbst nach `SUPABASE_URL` und `SUPABASE_PUBLISHABLE_KEY`
+(so steht es unter `[template.environment]` in `netlify.toml`), legt die Seite
+an und baut sie sofort.
+
+**Der lange Weg — von Hand:**
+
 1. **Add new site → Import an existing project → GitHub**, dieses Repository wählen.
 2. Build command und Publish directory kommen aus `netlify.toml`, nichts eintragen.
 3. **Site settings → Environment variables:** die beiden Werte oben eintragen.

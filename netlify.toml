@@ -8,6 +8,13 @@
   command = "sh erzeuge-konfig.sh"
   publish = "."
 
+# Damit Netlify beim Einrichten selbst nach den beiden Werten fragt,
+# statt dass man sie hinterher von Hand nachtraegt. Wirkt nur beim
+# Anlegen ueber den "Deploy to Netlify"-Knopf.
+[template.environment]
+  SUPABASE_URL = "Adresse des Supabase-Projekts, z. B. https://abcdefgh.supabase.co"
+  SUPABASE_PUBLISHABLE_KEY = "Der oeffentliche Schluessel (anon/publishable) - NICHT der Service-Key"
+
 # Sicherheits-Kopfzeilen fuer alle Seiten.
 [[headers]]
   for = "/*"
