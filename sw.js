@@ -6,7 +6,7 @@
  * die App veraltete Zeiten anzeigen oder Aenderungen verschlucken.
  */
 
-var SPEICHER = "zeiterfassung-v1";
+var SPEICHER = "zeiterfassung-v2";   // v2: Standort beim Stempeln (30.09.2026)
 
 var DATEIEN = [
   "./",
@@ -14,6 +14,7 @@ var DATEIEN = [
   "stil.css",
   "js/daten.js",
   "js/hilfen.js",
+  "js/standort.js",
   "js/app.js",
   "manifest.webmanifest",
   "symbole/symbol-192.png",

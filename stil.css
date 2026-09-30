@@ -9,6 +9,7 @@
   --grau:           #6B7480;
   --grau-hell:      #F2F4F6;
   --rot:            #B3261E;
+  --gruen:          #2C6B4F;
 
   --text:        var(--anthrazit);
   --text-leise:  var(--grau);
@@ -27,6 +28,7 @@
     --hintergrund: #161D25;
     --flaeche:     #1F2831;
     --rand:        #2C3742;
+    --gruen:       #7FC4A3;
   }
 }
 :root[data-theme="dark"] {
@@ -35,6 +37,7 @@
   --hintergrund: #161D25;
   --flaeche:     #1F2831;
   --rand:        #2C3742;
+  --gruen:       #7FC4A3;
 }
 
 * { box-sizing: border-box; }
@@ -337,3 +340,51 @@ input:focus, select:focus {
   z-index: 20;
 }
 .melder--fehler { background: var(--rot); }
+
+
+/* ---------- Standort beim Stempeln (30.09.2026) ---------- */
+
+.hinweiskasten {
+  border: 1px solid var(--rand);
+  border-left: 4px solid var(--gelb);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--flaeche);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.hinweiskasten h3 { margin: 0 0 8px; font-size: 16px; }
+.hinweiskasten p { margin: 0 0 10px; font-size: 14px; line-height: 1.5; }
+
+.stempel__ort {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text-leise);
+}
+.stempel__ort.sucht { color: var(--gelb-dunkel); }
+.stempel__ort.fehlt { color: var(--rot); }
+
+h2.abschnitt {
+  font-size: 16px;
+  margin: 26px 0 4px;
+}
+
+.tagzeile {
+  border: 1px solid var(--rand);
+  border-radius: var(--radius);
+  background: var(--flaeche);
+  padding: 11px 13px;
+  margin-top: 10px;
+}
+.tagzeile__kopf {
+  display: flex; justify-content: space-between; gap: 10px;
+  font-weight: 500; margin-bottom: 6px;
+}
+.tagzeile__ort { font-size: 13.5px; margin: 3px 0; }
+.tagzeile__ort span { color: var(--text-leise); }
+.tagzeile__mess { color: var(--text-leise); font-size: 12.5px; }
+.tagzeile input[type="text"] {
+  width: 100%; font: inherit; font-size: 14px; margin-top: 6px;
+  padding: 7px 10px; border-radius: 8px;
+  border: 1px solid var(--rand); background: var(--hintergrund); color: var(--text);
+}
+.tagzeile__bestaetigt { color: var(--gruen); font-size: 12.5px; font-weight: 500; }

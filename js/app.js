@@ -29,6 +29,8 @@
     wochenStart: null,
     personen: [],          // Namen aus der Spalte "mitarbeiter"
     person: "",            // ausgewaehlte Person, "" = alle
+    standortOk: false,     // Hinweis zum Standort bestaetigt?
+    tagSchichten: [],      // Schichten von heute, fuer den Tagesabschluss
   };
 
   var $ = function (id) { return document.getElementById(id); };
@@ -318,7 +320,167 @@
       )) || [];
       zustand.pause = pausen[0] || null;
     }
+
+    // Alles von heute, fuer den Tagesabschluss weiter unten.
+    var vonHeute = ZE.datumSchluessel(new Date());
+    zustand.tagSchichten = (await ZE.anfrage(
+      "stempel_schicht?select=*&start_zeit=gte." + vonHeute + "T00:00:00" +
+      "&order=start_zeit.asc"
+    )) || [];
+
+    hinweisPruefen();
     stempelZeichnen();
+    tagZeichnen();
+  }
+
+  /* ----- Tagesabschluss: ansehen, berichtigen, bestaetigen ----- */
+
+  function ortZeile(beschriftung, adresse, lat, lng, genauigkeit, fehler) {
+    if (fehler) {
+      return el("p", { klasse: "tagzeile__ort" }, [
+        el("span", { text: beschriftung + ": " }),
+        el("em", { text: "kein Standort (" + fehler + ")" }),
+      ]);
+    }
+    if (lat === null || lat === undefined) {
+      return el("p", { klasse: "tagzeile__ort" }, [
+        el("span", { text: beschriftung + ": " }),
+        el("em", { text: "kein Standort" }),
+      ]);
+    }
+    var text = adresse || (Number(lat).toFixed(5) + ", " + Number(lng).toFixed(5));
+    return el("p", { klasse: "tagzeile__ort" }, [
+      el("span", { text: beschriftung + ": " }),
+      el("strong", { text: text }),
+      el("span", {
+        klasse: "tagzeile__mess",
+        text: genauigkeit ? "  \u00b7 auf " + genauigkeit + " m genau" : "",
+      }),
+    ]);
+  }
+
+  function tagZeichnen() {
+    var liste = $("tag-liste");
+    var schichten = zustand.tagSchichten;
+    $("tag-ueberschrift").hidden = schichten.length === 0;
+    $("tag-text").hidden = schichten.length === 0;
+    liste.textContent = "";
+
+    schichten.forEach(function (s) {
+      var zeile = el("div", { klasse: "tagzeile" });
+
+      var dauer = s.ende_zeit
+        ? ZE.stundenText(ZE.minutenZwischen(s.start_zeit, s.ende_zeit) / 60)
+        : "l\u00e4uft";
+      zeile.appendChild(el("div", { klasse: "tagzeile__kopf" }, [
+        el("span", { text: ZE.uhrzeit(s.start_zeit) + (s.ende_zeit ? "\u2013" + ZE.uhrzeit(s.ende_zeit) : "") }),
+        el("span", { text: dauer }),
+      ]));
+      if (s.projekt || s.kunde) {
+        zeile.appendChild(el("p", { klasse: "leise", text: [s.projekt, s.kunde].filter(Boolean).join(" \u00b7 ") }));
+      }
+
+      zeile.appendChild(ortZeile("Eingestempelt", s.start_adresse, s.start_lat, s.start_lng,
+                                 s.start_genauigkeit, s.start_fehler));
+      if (s.ende_zeit) {
+        zeile.appendChild(ortZeile("Ausgestempelt", s.ende_adresse, s.ende_lat, s.ende_lng,
+                                   s.ende_genauigkeit, s.ende_fehler));
+      }
+
+      var feld = el("input", {
+        type: "text",
+        wert: s.start_adresse_korrigiert || "",
+        placeholder: "Eigene Angabe, falls der Ort nicht stimmt",
+      });
+      feld.setAttribute("aria-label", "Eigene Angabe zum Ort");
+      zeile.appendChild(feld);
+
+      var knopf = el("button", {
+        klasse: "knopf knopf--rand",
+        text: s.bestaetigt_am ? "Best\u00e4tigt" : "Best\u00e4tigen",
+      });
+      knopf.disabled = !!s.bestaetigt_am && !feld.value;
+      knopf.style.marginTop = "8px";
+      knopf.addEventListener("click", async function () {
+        knopf.disabled = true;
+        try {
+          await ZE.anfrage("stempel_schicht?id=eq." + s.id, {
+            methode: "PATCH",
+            rueckgabe: "minimal",
+            koerper: {
+              start_adresse_korrigiert: feld.value.trim() || null,
+              bestaetigt_am: new Date().toISOString(),
+            },
+          });
+          melden("Gespeichert.");
+          await stempelLaden();
+        } catch (fehler) {
+          fehlerBehandeln(fehler);
+          knopf.disabled = false;
+        }
+      });
+      zeile.appendChild(knopf);
+
+      if (s.bestaetigt_am) {
+        zeile.appendChild(el("p", {
+          klasse: "tagzeile__bestaetigt",
+          text: "Von dir best\u00e4tigt um " + ZE.uhrzeit(s.bestaetigt_am),
+        }));
+      }
+      liste.appendChild(zeile);
+    });
+  }
+
+  /* ----- Standort ----- */
+
+  function ortAnzeigen(text, art) {
+    var feld = $("stempel-ort");
+    feld.textContent = text || "";
+    feld.className = "stempel__ort" + (art ? " " + art : "");
+  }
+
+  function hinweisPruefen() {
+    $("standort-hinweis").hidden = zustand.standortOk;
+    $("knopf-stempeln").disabled = !zustand.standortOk;
+  }
+
+  $("knopf-standort-ok").addEventListener("click", async function () {
+    var knopf = this;
+    knopf.disabled = true;
+    try {
+      await ZE.anfrage("profiles?id=eq." + zustand.benutzer.id, {
+        methode: "PATCH",
+        rueckgabe: "minimal",
+        koerper: { standort_hinweis_am: new Date().toISOString() },
+      });
+      zustand.standortOk = true;
+      hinweisPruefen();
+      melden("Danke. Der Standort wird ab jetzt beim Stempeln gespeichert.");
+    } catch (fehler) {
+      fehlerBehandeln(fehler);
+      knopf.disabled = false;
+    }
+  });
+
+  /* Holt den Standort und zeigt den Fortschritt an. Der Standort ist
+     Pflicht: ohne Erlaubnis wird nicht gestempelt. Findet das Geraet
+     keinen Empfang, wird der Grund mitgeschrieben und die Zeit trotzdem
+     erfasst - eine fehlende Stempelung waere schlimmer als ein fehlender Ort. */
+  async function ortHolen() {
+    ortAnzeigen("Standort wird gesucht \u2026", "sucht");
+    try {
+      var ort = await ZEStandort.holen(20);
+      ortAnzeigen("Standort auf " + ort.genauigkeit + " m genau.");
+      return { lat: ort.lat, lng: ort.lng, genauigkeit: ort.genauigkeit, fehler: null };
+    } catch (f) {
+      if (f.code === 1) {
+        // Erlaubnis verweigert: das ist eine Entscheidung, kein Empfangsproblem.
+        ortAnzeigen("Ohne Standort-Erlaubnis kann nicht gestempelt werden.", "fehlt");
+        throw new Error("Bitte den Standort erlauben. Die App misst nur beim Stempeln.");
+      }
+      ortAnzeigen("Kein Standort: " + f.grund + ". Zeit wird trotzdem erfasst.", "fehlt");
+      return { lat: null, lng: null, genauigkeit: null, fehler: f.grund };
+    }
   }
 
   var stempelUhrZeit = null;
@@ -364,6 +526,7 @@
     knopf.disabled = true;
     try {
       if (!zustand.schicht) {
+        var ort = await ortHolen();
         var kategorie = $("feld-kategorie").value;
         await ZE.anfrage("stempel_schicht", {
           methode: "POST",
@@ -373,12 +536,28 @@
             kunde: $("feld-kunde").value.trim() || null,
             projekt: $("feld-projekt").value.trim() || null,
             kategorie_id: kategorie ? Number(kategorie) : null,
+            start_lat: ort.lat,
+            start_lng: ort.lng,
+            start_genauigkeit: ort.genauigkeit,
+            start_fehler: ort.fehler,
           },
         });
         melden("Eingestempelt.");
       } else {
-        // Die Datenbank-Funktion rechnet Pausen ab und schreibt
-        // die fertige Zeile in die Tabelle "Stunden".
+        // Erst den Ort auf die laufende Zeile schreiben, dann abschliessen.
+        // Die Datenbank-Funktion rechnet Pausen ab und schreibt die fertige
+        // Zeile in die Tabelle "Stunden".
+        var ortEnde = await ortHolen();
+        await ZE.anfrage("stempel_schicht?id=eq." + zustand.schicht.id, {
+          methode: "PATCH",
+          rueckgabe: "minimal",
+          koerper: {
+            ende_lat: ortEnde.lat,
+            ende_lng: ortEnde.lng,
+            ende_genauigkeit: ortEnde.genauigkeit,
+            ende_fehler: ortEnde.fehler,
+          },
+        });
         await ZE.funktion("stempel_ausstempeln");
         melden("Ausgestempelt und in Stunden eingetragen.");
       }
@@ -585,10 +764,11 @@
 
     try {
       var profile = await ZE.anfrage(
-        "profiles?select=full_name,zeiterfassung_name&id=eq." + s.user.id
+        "profiles?select=full_name,zeiterfassung_name,standort_hinweis_am&id=eq." + s.user.id
       );
       if (profile && profile[0]) {
         zustand.benutzer.name = profile[0].zeiterfassung_name || profile[0].full_name || null;
+        zustand.standortOk = !!profile[0].standort_hinweis_am;
       }
     } catch (fehler) {
       // Ohne Profil laeuft die App weiter, dann eben ohne Namensfilter.

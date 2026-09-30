@@ -53,10 +53,23 @@
 
     <!-- ---- Stempeln ---- -->
     <section id="seite-stempeln" class="seite" hidden>
+      <div id="standort-hinweis" class="hinweiskasten" hidden>
+        <h3>Standort beim Stempeln</h3>
+        <p>Diese App misst beim <strong>Ein- und Ausstempeln</strong> einmal deinen Standort und
+          speichert ihn zusammen mit der Uhrzeit. Damit wird nachvollziehbar, auf welcher Baustelle
+          die Zeit angefallen ist.</p>
+        <p>Was <strong>nicht</strong> passiert: Die App verfolgt dich nicht laufend. Zwischen dem
+          Ein- und dem Ausstempeln wird nichts gemessen, und im Hintergrund l&auml;uft nichts mit.</p>
+        <p>Den gemessenen Ort siehst du sofort. Stimmt er nicht, kannst du am Ende des Tages deine
+          eigene Angabe danebenschreiben &ndash; der Messwert bleibt stehen, deine Angabe kommt dazu.</p>
+        <button id="knopf-standort-ok" class="knopf knopf--gelb">Verstanden und einverstanden</button>
+      </div>
+
       <div id="stempel-anzeige" class="stempel">
         <p class="stempel__zustand" id="stempel-zustand">Nicht eingestempelt</p>
         <p class="stempel__uhr" id="stempel-uhr">--:--</p>
         <p class="stempel__seit" id="stempel-seit"></p>
+        <p class="stempel__ort" id="stempel-ort"></p>
       </div>
       <div class="feldpaar">
         <label for="feld-kunde">Kunde</label>
@@ -73,6 +86,11 @@
       <button id="knopf-stempeln" class="knopf knopf--gelb knopf--gross">Einstempeln</button>
       <button id="knopf-pause" class="knopf knopf--rand" hidden>Pause beginnen</button>
       <p id="stempel-fehler" class="fehler" hidden></p>
+
+      <h2 class="abschnitt" id="tag-ueberschrift" hidden>Heutiger Tag</h2>
+      <p class="leise" id="tag-text" hidden>Stimmt ein Ort nicht? Schreib deine eigene Angabe
+        daneben. Der gemessene Wert bleibt stehen.</p>
+      <div id="tag-liste"></div>
     </section>
 
     <!-- ---- Woche ---- -->
@@ -138,6 +156,7 @@
 <script src="konfig.js"></script>
 <script src="js/daten.js"></script>
 <script src="js/hilfen.js"></script>
+<script src="js/standort.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
