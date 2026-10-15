@@ -1,0 +1,67 @@
+# Veroeffentlicht die Zeiterfassungs-App auf GitHub Pages.
+#
+# Warum: Netlify liefert alle Seiten des Teams nur noch nach Anmeldung aus
+# (HTTP 401). Dadurch kann Chrome das manifest und den Service Worker nicht
+# laden, und der Menuepunkt "App installieren" erscheint auf dem Handy gar
+# nicht. GitHub Pages hat diese Sperre nicht.
+#
+# konfig.js wird hier genauso erzeugt wie bei Netlify - mit demselben Skript
+# erzeuge-konfig.sh. Die beiden Werte kommen aus den Repository-Secrets und
+# landen nie im Repository.
+
+name: Auf GitHub Pages veroeffentlichen
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:      # erlaubt das Veroeffentlichen auch von Hand
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Immer nur eine Veroeffentlichung gleichzeitig.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  bauen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Quelltext holen
+        uses: actions/checkout@v4
+
+      - name: konfig.js aus den Secrets erzeugen
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: sh erzeuge-konfig.sh
+
+      - name: Nur die Dateien einsammeln, die ins Netz gehoeren
+        run: |
+          mkdir -p seite
+          cp index.html stil.css manifest.webmanifest sw.js konfig.js seite/
+          cp -r js symbole seite/
+          echo "--- wird veroeffentlicht ---"
+          find seite -type f | sort
+
+      - name: Pages vorbereiten
+        uses: actions/configure-pages@v5
+
+      - name: Dateien hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: seite
+
+  veroeffentlichen:
+    needs: bauen
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.veroeffentlichung.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages schalten
+        id: veroeffentlichung
+        uses: actions/deploy-pages@v4
