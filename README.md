@@ -62,6 +62,35 @@ python3 -m http.server 8000
 
 Dann `http://localhost:8000` im Browser öffnen.
 
+## Auf GitHub Pages veröffentlichen
+
+Zweiter Weg, unabhängig von Netlify. Nötig, weil Netlify alle Seiten des Teams
+nur noch nach Anmeldung ausliefert (HTTP 401) — dadurch kann Chrome das
+`manifest.webmanifest` und den Service Worker nicht laden, und auf dem Handy
+erscheint der Menüpunkt **App installieren** gar nicht.
+
+Einmalig einzurichten, drei Schritte im Repository auf github.com:
+
+1. **Settings → Secrets and variables → Actions → New repository secret**
+   Zwei Stück anlegen:
+   * `SUPABASE_URL` — die Adresse des Supabase-Projekts
+   * `SUPABASE_PUBLISHABLE_KEY` — der **öffentliche** Schlüssel (anon/publishable),
+     **nicht** der Service-Key
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions**
+3. Fertig. Ab jetzt veröffentlicht jeder Push auf `main` von selbst.
+
+Die Adresse lautet danach:
+`https://ayar20260808.github.io/Zeiterfassungs-App/`
+
+`konfig.js` wird dabei mit demselben Skript `erzeuge-konfig.sh` erzeugt wie bei
+Netlify. Die beiden Werte stehen nur in den Secrets und landen nie im Repository.
+
+Veröffentlicht werden ausschließlich `index.html`, `stil.css`,
+`manifest.webmanifest`, `sw.js`, `konfig.js` sowie die Ordner `js/` und
+`symbole/`. Der Ordner `sql/`, `erzeuge-konfig.sh`, `netlify.toml` und
+`konfig.beispiel.js` bleiben außen vor — dasselbe, was `netlify.toml` über
+seine Weiterleitungen erreicht.
+
 ## Auf Netlify veröffentlichen
 
 **Der kurze Weg — ein Klick:**
